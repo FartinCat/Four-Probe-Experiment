@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Four-Probe Method — Virtual Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f3ef;--surface:#fff;--surface2:#eeede7;--border:#dddbd2;
+  --accent:#b5291c;--accent2:#e03b2b;--text:#181818;--muted:#666;
+  --sw:224px;--th:58px;
+  --mono:'IBM Plex Mono',monospace;--sans:'DM Sans',sans-serif;
+  --radius:7px;--shadow:0 2px 14px rgba(0,0,0,.07);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);
+  display:flex;min-height:100vh;font-size:15px;line-height:1.65}
+
+/* ── SIDEBAR ──────────────────────────────────────────── */
+.sidebar{width:var(--sw);min-height:100vh;background:#181818;
+  display:flex;flex-direction:column;position:fixed;
+  left:0;top:0;bottom:0;z-index:50;border-right:2px solid var(--accent)}
+.sb-brand{display:flex;align-items:center;gap:10px;
+  padding:20px 18px 18px;border-bottom:1px solid #2a2a2a}
+.sb-icon{font-size:1.6rem;color:var(--accent2);line-height:1}
+.sb-text{font-family:var(--mono);font-size:.82rem;font-weight:600;
+  color:#fff;line-height:1.4}
+.sb-text small{color:#888;font-weight:400;font-size:.72rem}
+.sb-nav{flex:1;padding:14px 0;overflow-y:auto}
+.nav-link{display:flex;align-items:center;gap:10px;padding:10px 20px;
+  color:#aaa;text-decoration:none;font-size:.83rem;font-weight:500;
+  transition:all .15s;border-left:3px solid transparent;cursor:pointer}
+.nav-link:hover{color:#fff;background:#222}
+.nav-link.active{color:#fff;background:#1f1f1f;
+  border-left-color:var(--accent);font-weight:600}
+.nav-icon{font-size:.95rem;width:18px;text-align:center}
+.sb-footer{padding:16px 20px;border-top:1px solid #2a2a2a;color:#555;
+  font-family:var(--mono);font-size:.72rem}
+
+/* ── MAIN ─────────────────────────────────────────────── */
+.main-wrap{margin-left:var(--sw);flex:1;display:flex;
+  flex-direction:column;min-height:100vh}
+.top-bar{height:var(--th);background:var(--surface);
+  border-bottom:1px solid var(--border);display:flex;
+  align-items:center;justify-content:space-between;padding:0 32px;
+  position:sticky;top:0;z-index:40}
+.page-heading{font-size:1.05rem;font-weight:600}
+.top-right{color:var(--muted);font-family:var(--mono);font-size:.72rem}
+.content{padding:32px;max-width:980px;width:100%}
+
+/* ── PANELS ───────────────────────────────────────────── */
+.panel{display:none}.panel.active{display:block;
+  animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:26px 28px;margin-bottom:18px;
+  box-shadow:var(--shadow)}
+.card h2{font-size:1.1rem;font-weight:600;margin-bottom:10px}
+.card p,.card li{color:#333}
+.card ul,.card ol{padding-left:20px}
+.card li{margin-bottom:6px}
+.sec-label{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.12em;color:var(--accent);font-weight:600;margin-bottom:10px}
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* ── FORMULA ──────────────────────────────────────────── */
+.formula{background:#181818;color:#fbbf24;font-family:var(--mono);
+  font-size:.92rem;padding:16px 22px;border-radius:var(--radius);
+  margin:14px 0;text-align:center;line-height:2}
+.formula small{color:#888;font-size:.7rem;display:block;margin-top:4px}
+
+/* ── INFO GRID ────────────────────────────────────────── */
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.info-tile{background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;padding:12px 14px}
+.tile-label{font-size:.68rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);margin-bottom:3px}
+.tile-val{font-family:var(--mono);font-size:.9rem;font-weight:700}
+
+/* ── STEPS ────────────────────────────────────────────── */
+.step{display:flex;gap:16px;margin-bottom:16px}
+.step-num{min-width:32px;height:32px;border-radius:50%;background:var(--accent);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-body strong{font-size:.95rem;display:block;margin-bottom:3px}
+.step-body p{color:var(--muted);font-size:.88rem}
+.step-note{background:#fffbeb;border-left:3px solid #f59e0b;padding:9px 12px;
+  margin-top:8px;border-radius:0 4px 4px 0;font-size:.82rem;color:#78400a}
+
+/* ── BADGES ───────────────────────────────────────────── */
+.badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);
+  border-radius:4px;padding:3px 9px;font-family:var(--mono);font-size:.75rem;
+  color:var(--accent);margin:3px 3px 3px 0;font-weight:700}
+
+/* ── HERO ─────────────────────────────────────────────── */
+.hero{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+.hero-main{background:linear-gradient(135deg,#181818 70%,#2a0a07);color:#fff;
+  border-radius:var(--radius);padding:30px 28px;border:1px solid #333}
+.hero-main h2{font-size:1.45rem;font-weight:700;margin-bottom:10px;line-height:1.3}
+.hero-main p{color:#aaa;font-size:.9rem;margin-bottom:18px}
+.hero-aside{display:flex;flex-direction:column;gap:12px}
+.stat-box{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 16px;flex:1}
+.stat-box .sv{font-family:var(--mono);font-size:1.2rem;font-weight:700;color:var(--accent)}
+.stat-box .sl{font-size:.72rem;color:var(--muted);margin-top:2px}
+.nav-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.nav-card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;text-decoration:none;
+  color:var(--text);transition:all .18s;display:block;cursor:pointer}
+.nav-card:hover{border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(181,41,28,.12);transform:translateY(-1px)}
+.nc-icon{font-size:1.3rem;margin-bottom:7px}
+.nc-title{font-weight:600;font-size:.9rem;margin-bottom:3px}
+.nc-desc{font-size:.76rem;color:var(--muted)}
+
+/* ── SIMULATION ───────────────────────────────────────── */
+#sim-canvas{width:100%;background:#f8f8f5;border:1px solid var(--border);
+  border-radius:6px;display:block}
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0}
+.ctrl-group label{display:block;font-size:.72rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+.ctrl-group input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.ctrl-val{font-family:var(--mono);font-size:.82rem;margin-top:3px}
+.meters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.meter{background:#181818;border-radius:6px;padding:14px 16px;text-align:center}
+.meter label{font-family:var(--mono);font-size:.63rem;color:#888;
+  text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:4px}
+.mval{font-family:var(--mono);font-size:1.2rem;font-weight:700;color:#34d399}
+.munit{font-family:var(--mono);font-size:.68rem;color:#666;margin-left:3px}
+
+/* ── BUTTONS ──────────────────────────────────────────── */
+.btn{font-family:var(--sans);font-size:.83rem;font-weight:600;
+  padding:9px 18px;border-radius:6px;border:none;cursor:pointer;
+  transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+.btn-dark{background:#181818;color:#fff}
+.btn-dark:hover{background:#333}
+.btn-sm{padding:6px 13px;font-size:.76rem}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* ── OBSERVATION TABLE ────────────────────────────────── */
+.igroup{display:flex;flex-direction:column;gap:4px;min-width:130px}
+.igroup label{font-size:.7rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--muted)}
+.igroup input{font-family:var(--sans);font-size:.87rem;padding:8px 10px;
+  border:1px solid var(--border);border-radius:5px;
+  background:var(--surface);color:var(--text);outline:none}
+.igroup input:focus{border-color:var(--accent)}
+.obs-header{display:flex;gap:12px;flex-wrap:wrap;
+  align-items:flex-end;margin-bottom:16px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+thead th{background:#181818;color:#fff;font-family:var(--mono);
+  font-size:.65rem;font-weight:700;padding:10px 12px;text-align:center;
+  letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+thead th small{color:#888;font-weight:400;display:block}
+tbody tr:nth-child(even){background:var(--surface2)}
+tbody tr:hover{background:#e8f4fd}
+tbody td{padding:8px 12px;text-align:center;
+  border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.78rem}
+td.auto{color:var(--accent);font-weight:600}
+td.inp input{font-family:var(--mono);font-size:.78rem;width:84px;
+  text-align:center;border:1px solid transparent;border-radius:4px;
+  background:transparent;padding:3px 5px;outline:none;transition:border .15s}
+td.inp input:focus{border-color:var(--accent);background:#fff}
+.tag{font-size:.58rem;padding:1px 5px;border-radius:3px;
+  font-family:var(--sans);margin-left:3px;display:inline-block}
+.tag-in{background:#dbeafe;color:#1e40af}
+.tag-auto{background:#dcfce7;color:#166534}
+.msg{font-family:var(--mono);font-size:.8rem;margin-top:10px;
+  padding:8px 12px;border-radius:5px;display:none}
+.msg.ok{background:#dcfce7;color:#166534;display:block}
+.msg.err{background:#fee2e2;color:#991b1b;display:block}
+
+/* ── CALC BOXES ───────────────────────────────────────── */
+.calc-box{background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;padding:14px 18px;margin-bottom:10px}
+.clabel{font-family:var(--mono);font-size:.68rem;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.ceq{font-family:var(--mono);font-size:.86rem}
+
+/* ── RESULT BOX ───────────────────────────────────────── */
+.result-display{background:#181818;color:#34d399;font-family:var(--mono);
+  padding:18px 22px;border-radius:8px;margin-top:14px}
+.rl{font-size:.65rem;color:#888;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:4px;display:block}
+.rv{font-size:1.5rem;font-weight:700}
+.ru{font-size:.9rem;color:#aaa;margin-left:6px}
+
+/* ── GRAPH ────────────────────────────────────────────── */
+#graph-canvas{width:100%;background:#fff;border:1px solid var(--border);
+  border-radius:6px;display:block}
+
+/* ── SCROLLBAR ────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ═══════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <span class="sb-icon">⬡</span>
+    <span class="sb-text">Four-Probe<br><small>Virtual Lab</small></span>
+  </div>
+  <nav class="sb-nav" id="sb-nav">
+    <a class="nav-link active" onclick="show('home')" ><span class="nav-icon">⌂</span> Overview</a>
+    <a class="nav-link" onclick="show('theory')"      ><span class="nav-icon">📐</span> Aim & Theory</a>
+    <a class="nav-link" onclick="show('apparatus')"   ><span class="nav-icon">🔬</span> Apparatus</a>
+    <a class="nav-link" onclick="show('procedure')"   ><span class="nav-icon">📋</span> Procedure</a>
+    <a class="nav-link" onclick="show('simulation')"  ><span class="nav-icon">⚡</span> Simulation</a>
+    <a class="nav-link" onclick="show('observation')" ><span class="nav-icon">📊</span> Observation</a>
+    <a class="nav-link" onclick="show('calculation')" ><span class="nav-icon">🧮</span> Calculation</a>
+    <a class="nav-link" onclick="show('graph')"       ><span class="nav-icon">📈</span> Graph</a>
+    <a class="nav-link" onclick="show('result')"      ><span class="nav-icon">✅</span> Result</a>
+  </nav>
+  <div class="sb-footer">Semiconductor Physics</div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════ -->
+<div class="main-wrap">
+  <header class="top-bar">
+    <h1 class="page-heading" id="page-heading">Overview</h1>
+    <div class="top-right">Si | W = 0.05 cm | s = 0.20 cm | I = 5 mA</div>
+  </header>
+  <main class="content">
+
+<!-- ══════════════ HOME ══════════════════════════════════ -->
+<div class="panel active" id="panel-home">
+  <div class="hero">
+    <div class="hero-main">
+      <h2>Four-Probe Method<br>Virtual Laboratory</h2>
+      <p>Measure the resistivity of a Silicon semiconductor and determine its band gap energy using the Four-Probe technique — simulated with authentic physics.</p>
+      <button class="btn btn-primary" onclick="show('simulation')">▶ Start Simulation</button>
+      <button class="btn btn-secondary" onclick="show('theory')" style="margin-left:8px;">Read Theory</button>
+    </div>
+    <div class="hero-aside">
+      <div class="stat-box"><div class="sv">1.12 eV</div><div class="sl">Si Band Gap (Standard)</div></div>
+      <div class="stat-box"><div class="sv">~10 Ω·cm</div><div class="sl">ρ at Room Temperature</div></div>
+      <div class="stat-box"><div class="sv">300–450 K</div><div class="sl">Temperature Range</div></div>
+    </div>
+  </div>
+  <div class="sec-label">Navigate the Lab</div>
+  <div class="nav-cards">
+    <div class="nav-card" onclick="show('theory')"><div class="nc-icon">📐</div><div class="nc-title">Aim & Theory</div><div class="nc-desc">Four-probe principle, resistivity formula, band gap derivation</div></div>
+    <div class="nav-card" onclick="show('apparatus')"><div class="nc-icon">🔬</div><div class="nc-title">Apparatus</div><div class="nc-desc">Instruments, specimen specs, and setup details</div></div>
+    <div class="nav-card" onclick="show('procedure')"><div class="nc-icon">📋</div><div class="nc-title">Procedure</div><div class="nc-desc">Step-by-step experimental instructions</div></div>
+    <div class="nav-card" onclick="show('simulation')"><div class="nc-icon">⚡</div><div class="nc-title">Simulation</div><div class="nc-desc">Interactive circuit with live physics engine</div></div>
+    <div class="nav-card" onclick="show('observation')"><div class="nc-icon">📊</div><div class="nc-title">Observation Table</div><div class="nc-desc">Enter data, auto-calculate ρ and ln(ρ)</div></div>
+    <div class="nav-card" onclick="show('graph')"><div class="nc-icon">📈</div><div class="nc-title">Graph & Result</div><div class="nc-desc">ln(ρ) vs 1/T plot with regression and Eg</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ THEORY ═════════════════════════════════ -->
+<div class="panel" id="panel-theory">
+  <div class="card">
+    <div class="sec-label">Aim of the Experiment</div>
+    <h2>To measure the resistivity of a semiconductor (Silicon) specimen using the Four-Probe Method and to study its variation with temperature.</h2>
+    <div class="info-grid">
+      <div class="info-tile"><div class="tile-label">Specimen</div><div class="tile-val">p-type Silicon</div></div>
+      <div class="info-tile"><div class="tile-label">Method</div><div class="tile-val">Four-Probe</div></div>
+      <div class="info-tile"><div class="tile-label">Measured Qty.</div><div class="tile-val">Resistivity (ρ)</div></div>
+      <div class="info-tile"><div class="tile-label">Temperature Range</div><div class="tile-val">300 K – 450 K</div></div>
+      <div class="info-tile"><div class="tile-label">Probe Spacing (s)</div><div class="tile-val">0.20 cm</div></div>
+      <div class="info-tile"><div class="tile-label">Thickness (W)</div><div class="tile-val">0.05 cm</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Why Four Probes?</div>
+    <p>In a two-probe measurement, <strong>contact resistance</strong> adds to the measured resistance — a large error in semiconductors. The Four-Probe Method fixes this by separating current injection from voltage sensing:</p>
+    <ul style="margin-top:10px">
+      <li><strong>Outer probes P1 & P4</strong> — carry the current I.</li>
+      <li><strong>Inner probes P2 & P3</strong> — measure voltage V. No current flows through them, so contact resistance does not affect the reading.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="sec-label">Resistivity Formula</div>
+    <p>For a thin specimen (W/s &lt; 0.5 — our case: W/s = 0.25):</p>
+    <div class="formula">ρ = (V / I) × (π × W / ln 2)<br><small>ρ in Ω·cm | W in cm | V in Volts | I in Amperes</small></div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Temperature Dependence & Band Gap</div>
+    <div class="formula">ρ(T) = ρ₀ · exp(Eg / 2kT)<br><small>Eg = band gap (eV) | k = 8.617×10⁻⁵ eV/K | T in Kelvin</small></div>
+    <p>Taking logarithm → <strong>ln(ρ) vs 1/T is a straight line.</strong> Slope = Eg/(2k):</p>
+    <div class="formula">Eg = 2 × k × |slope| = 2 × 8.617×10⁻⁵ × |slope| eV</div>
+    <div style="margin-top:12px">
+      <span class="badge">ρ — Resistivity (Ω·cm)</span><span class="badge">V — Voltage (mV)</span>
+      <span class="badge">I — Current (mA)</span><span class="badge">W — Thickness (cm)</span>
+      <span class="badge">T — Temperature (K)</span><span class="badge">Eg — Band gap (eV)</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ APPARATUS ══════════════════════════════ -->
+<div class="panel" id="panel-apparatus">
+  <div class="card">
+    <div class="sec-label">Instruments Required</div>
+    <ul>
+      <li>Four-Probe Apparatus (spring-loaded tungsten probe unit)</li>
+      <li>Constant Current Source — DC, regulated (0–200 mA)</li>
+      <li>Digital Millivoltmeter / Nanovoltmeter (resolution: 0.001 mV)</li>
+      <li>Digital Milliammeter (resolution: 0.01 mA)</li>
+      <li>Type-K Thermocouple with digital temperature indicator (±0.5°C)</li>
+      <li>Programmable Oven / Furnace with PID temperature controller (25–250°C)</li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="sec-label">Silicon Specimen Specifications</div>
+    <div class="info-grid">
+      <div class="info-tile"><div class="tile-label">Material</div><div class="tile-val">p-type Si</div></div>
+      <div class="info-tile"><div class="tile-label">Thickness W</div><div class="tile-val">0.05 cm</div></div>
+      <div class="info-tile"><div class="tile-label">Probe spacing s</div><div class="tile-val">0.20 cm</div></div>
+      <div class="info-tile"><div class="tile-label">W/s ratio</div><div class="tile-val">0.25 (thin regime)</div></div>
+      <div class="info-tile"><div class="tile-label">ρ at room temp</div><div class="tile-val">~10 Ω·cm</div></div>
+      <div class="info-tile"><div class="tile-label">Band gap</div><div class="tile-val">1.12 eV</div></div>
+      <div class="info-tile"><div class="tile-label">Constant current I</div><div class="tile-val">5.0 mA</div></div>
+      <div class="info-tile"><div class="tile-label">Temp. range</div><div class="tile-val">27°C – 175°C</div></div>
+      <div class="info-tile"><div class="tile-label">Probe material</div><div class="tile-val">Tungsten (W)</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Circuit Description</div>
+    <ul>
+      <li><strong>Current Loop:</strong> CCS → P1 → Silicon specimen → P4 → back to CCS.</li>
+      <li><strong>Voltage Loop:</strong> Digital Millivoltmeter across P2 and P3 (inner probes only).</li>
+    </ul>
+    <div class="step-note" style="margin-top:12px">⚠ Probes must be collinear: P1 – P2 – P3 – P4, with equal spacing s between each adjacent pair.</div>
+  </div>
+</div>
+
+<!-- ══════════════ PROCEDURE ══════════════════════════════ -->
+<div class="panel" id="panel-procedure">
+  <div class="card">
+    <div class="sec-label">Step-by-Step Instructions</div>
+    <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Sample Preparation</strong><p>Clean the Silicon specimen with acetone/IPA. Mount it flat on the insulated sample holder.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Probe Alignment & Contact</strong><p>Lower the four collinear probes (s = 0.20 cm) gently using the micrometer. Apply minimum pressure for stable electrical contact.</p><div class="step-note">⚠ Probe order: P1 – P2 – P3 – P4 (left to right). Verify equal spacing.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Circuit Connections</strong><p>Connect <strong>outer probes P1 & P4</strong> to the Constant Current Source. Connect <strong>inner probes P2 & P3</strong> to the Digital Millivoltmeter.</p><div class="step-note">📌 Never connect the current source to inner probes or voltmeter to outer probes.</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Thermocouple Installation</strong><p>Insert the thermocouple into the sample holder as close to the specimen as possible. Verify room temperature on the indicator.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><strong>Room Temperature Reading</strong><p>Set I = 5 mA. Record T₁ (≈ 27°C) and V₁ from the millivoltmeter. This is Observation No. 1.</p></div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-body"><strong>Heating & Data Collection</strong><p>Switch on the oven. Increase temperature in steps of ~10°C. Wait ~2 min at each step for stabilisation, then record T and V.</p><div class="step-note">📌 Keep I constant at 5 mA throughout. Do not change it between readings.</div></div></div>
+    <div class="step"><div class="step-num">7</div><div class="step-body"><strong>Maximum Temperature</strong><p>Continue until ~175°C (448 K). Take at least 14–16 readings total.</p><div class="step-note">⚠ Do not exceed 200°C — permanent specimen damage may occur.</div></div></div>
+    <div class="step"><div class="step-num">8</div><div class="step-body"><strong>Cooling Down</strong><p>Switch off the heater after the last reading. Let the system cool naturally before removing the specimen.</p></div></div>
+    <div class="step"><div class="step-num">9</div><div class="step-body"><strong>Calculations & Graph</strong><p>Compute R = V/I, ρ = R·πW/ln2, ln(ρ) for each row. Plot ln(ρ) vs 1/T to find slope → Eg.</p></div></div>
+  </div>
+</div>
+
+<!-- ══════════════ SIMULATION ═════════════════════════════ -->
+<div class="panel" id="panel-simulation">
+  <div class="card">
+    <div class="sec-label">Circuit Diagram</div>
+    <canvas id="sim-canvas" height="300"></canvas>
+  </div>
+  <div class="card">
+    <div class="sec-label">Controls</div>
+    <div class="ctrl-grid">
+      <div class="ctrl-group">
+        <label>Current I (mA)</label>
+        <input type="range" id="ctrl-I" min="1" max="20" step="0.5" value="5" oninput="runSim()"/>
+        <div class="ctrl-val" id="dI">5.0 mA</div>
+      </div>
+      <div class="ctrl-group">
+        <label>Temperature T (K)</label>
+        <input type="range" id="ctrl-T" min="300" max="450" step="5" value="300" oninput="runSim()"/>
+        <div class="ctrl-val" id="dT">300 K</div>
+      </div>
+      <div class="ctrl-group">
+        <label>Thickness W (cm)</label>
+        <input type="range" id="ctrl-W" min="0.02" max="0.10" step="0.01" value="0.05" oninput="runSim()"/>
+        <div class="ctrl-val" id="dW">0.05 cm</div>
+      </div>
+    </div>
+    <div class="meters-grid">
+      <div class="meter"><label>Voltage V (inner)</label><span class="mval" id="m-V">—</span><span class="munit">mV</span></div>
+      <div class="meter"><label>Resistance R</label><span class="mval" id="m-R">—</span><span class="munit">Ω</span></div>
+      <div class="meter"><label>Resistivity ρ</label><span class="mval" id="m-rho">—</span><span class="munit">Ω·cm</span></div>
+      <div class="meter"><label>1/T × 10³</label><span class="mval" id="m-iT">—</span><span class="munit">K⁻¹</span></div>
+      <div class="meter"><label>ln(ρ)</label><span class="mval" id="m-ln">—</span><span class="munit"></span></div>
+      <div class="meter"><label>T (°C)</label><span class="mval" id="m-TC">—</span><span class="munit">°C</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="recordFromSim()">📥 Record to Observation Table</button>
+      <button class="btn btn-secondary" onclick="runSim()">🔄 Refresh</button>
+    </div>
+    <div id="sim-msg" class="msg"></div>
+  </div>
+</div>
+
+<!-- ══════════════ OBSERVATION ════════════════════════════ -->
+<div class="panel" id="panel-observation">
+  <div class="card">
+    <div class="sec-label">Fixed Parameters</div>
+    <div class="obs-header">
+      <div class="igroup"><label>Constant Current I (mA)</label><input type="number" id="obs-I" value="5" step="0.5" min="0.1"/></div>
+      <div class="igroup"><label>Thickness W (cm)</label><input type="number" id="obs-W" value="0.05" step="0.001" min="0.001"/></div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="loadSample()">Load Sample Data</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearObs()">Clear Table</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Observations — Enter T(°C) and V(mV), all other columns are automatic</div>
+    <div class="table-wrap">
+      <table id="obs-table">
+        <thead><tr>
+          <th>Sl.</th>
+          <th>T<small>(°C) <span class="tag tag-in">input</span></small></th>
+          <th>T<small>(K) <span class="tag tag-auto">auto</span></small></th>
+          <th>1/T×10³<small>(K⁻¹) <span class="tag tag-auto">auto</span></small></th>
+          <th>V<small>(mV) <span class="tag tag-in">input</span></small></th>
+          <th>I<small>(mA) <span class="tag tag-auto">auto</span></small></th>
+          <th>R=V/I<small>(Ω) <span class="tag tag-auto">auto</span></small></th>
+          <th>ρ=R·πW/ln2<small>(Ω·cm) <span class="tag tag-auto">auto</span></small></th>
+          <th>ln(ρ)<small><span class="tag tag-auto">auto</span></small></th>
+        </tr></thead>
+        <tbody id="obs-body"></tbody>
+      </table>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-sm" onclick="addObsRow()">+ Add Row</button>
+      <button class="btn btn-secondary btn-sm" onclick="removeObsRow()">− Remove Last</button>
+      <button class="btn btn-primary btn-sm" onclick="recalcAll()">↻ Recalculate All</button>
+      <button class="btn btn-dark btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+    <div id="obs-msg" class="msg"></div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Formula Reference</div>
+    <div class="calc-box"><div class="clabel">Resistance</div><div class="ceq">R (Ω) = V (V) / I (A) — convert: V_V = V_mV × 10⁻³, I_A = I_mA × 10⁻³</div></div>
+    <div class="calc-box"><div class="clabel">Resistivity (thin specimen)</div><div class="ceq">ρ (Ω·cm) = R × π × W / ln(2) = R × 3.14159 × W / 0.69315</div></div>
+    <div class="calc-box"><div class="clabel">Inverse Temperature</div><div class="ceq">1/T × 10³ = 1000 / T(K)</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ CALCULATION ════════════════════════════ -->
+<div class="panel" id="panel-calculation">
+  <div class="card">
+    <div class="sec-label">Single-Row Calculator</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+      <div class="igroup"><label>Voltage V (mV)</label><input type="number" id="c-V" placeholder="e.g. 12.485" step="0.001" oninput="liveCalc()"/></div>
+      <div class="igroup"><label>Current I (mA)</label><input type="number" id="c-I" placeholder="e.g. 5.0" step="0.5" oninput="liveCalc()"/></div>
+      <div class="igroup"><label>Thickness W (cm)</label><input type="number" id="c-W" value="0.05" step="0.001" oninput="liveCalc()"/></div>
+      <div class="igroup"><label>Temperature T (K)</label><input type="number" id="c-T" placeholder="e.g. 300" step="1" oninput="liveCalc()"/></div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="liveCalc()">Calculate</button>
+    <div id="calc-steps" style="margin-top:18px"></div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Band Gap Energy from Graph Slope</div>
+    <div class="formula">Slope = Eg / (2k) → Eg = 2 × k × |Slope|<br><small>k = 8.617×10⁻⁵ eV/K | Slope in K (from 1/T in K⁻¹ axis)</small></div>
+    <div style="display:flex;gap:14px;align-items:flex-end;margin-top:16px;flex-wrap:wrap">
+      <div class="igroup"><label>Slope of ln(ρ) vs 1/T (K)</label><input type="number" id="c-slope" placeholder="e.g. 6510" step="1" oninput="calcEg()"/></div>
+      <button class="btn btn-primary btn-sm" onclick="calcEg()">Compute Eg</button>
+    </div>
+    <div id="eg-result" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Formula Reference Sheet</div>
+    <div class="calc-box"><div class="clabel">Step 1 — Unit Conversion</div><div class="ceq">V(V) = V(mV)×10⁻³ | I(A) = I(mA)×10⁻³ | T(K) = T(°C)+273.15</div></div>
+    <div class="calc-box"><div class="clabel">Step 2 — Resistance</div><div class="ceq">R (Ω) = V (V) / I (A)</div></div>
+    <div class="calc-box"><div class="clabel">Step 3 — Resistivity</div><div class="ceq">ρ (Ω·cm) = R × π × W / ln(2) [π=3.14159, ln2=0.69315, W in cm]</div></div>
+    <div class="calc-box"><div class="clabel">Step 4 — Log & Inverse Temp</div><div class="ceq">ln(ρ) = loge(ρ) &nbsp;&nbsp; 1/T × 10³ = 1000/T(K)</div></div>
+    <div class="calc-box"><div class="clabel">Step 5 — Band Gap</div><div class="ceq">Eg = 2 × 8.617×10⁻⁵ × |slope_K| eV</div></div>
+    <div class="calc-box"><div class="clabel">Constants</div><div class="ceq">k = 8.617×10⁻⁵ eV/K | ln(2) = 0.6931 | π = 3.1416</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ GRAPH ══════════════════════════════════ -->
+<div class="panel" id="panel-graph">
+  <div class="card">
+    <div class="sec-label">ln(ρ) vs 1/T × 10³ Plot</div>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">Data is read from the Observation Table. Fill in observations first, then click Refresh Graph.</p>
+    <button class="btn btn-primary btn-sm" onclick="drawGraph()" style="margin-bottom:14px">Refresh Graph</button>
+    <canvas id="graph-canvas" height="420"></canvas>
+    <div id="graph-info" style="margin-top:12px;font-family:var(--mono);font-size:.82rem;color:var(--accent);min-height:18px"></div>
+  </div>
+  <div class="card">
+    <div class="sec-label">How to Read the Graph</div>
+    <ul>
+      <li>Each <strong>black dot</strong> is one observation: x = 1/T × 10³, y = ln(ρ).</li>
+      <li>The <span style="color:#b5291c;font-weight:600">red dashed line</span> is the best-fit linear regression.</li>
+      <li><strong>Slope</strong> of the line = Eg / (2k). Read from graph or the value shown below canvas.</li>
+      <li><strong>Eg</strong> = 2 × k × |slope| = 2 × 8.617×10⁻⁵ × |slope_K| eV</li>
+      <li>For p-Si the slope ≈ 6500 K → Eg ≈ 1.12 eV.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════ RESULT ═════════════════════════════════ -->
+<div class="panel" id="panel-result">
+  <div class="card">
+    <div class="sec-label">Experimental Result</div>
+    <div id="result-content">
+      <p style="color:var(--muted)">No observation data yet. Fill the Observation Table, then click Compute Result.</p>
+    </div>
+    <button class="btn btn-primary btn-sm" style="margin-top:14px" onclick="computeResult()">Compute Result from Observations</button>
+  </div>
+  <div class="card">
+    <div class="sec-label">Conclusion</div>
+    <p>The resistivity of the Silicon (p-type) specimen decreases exponentially with increasing temperature, confirming semiconductor behaviour. From the slope of the ln(ρ) vs 1/T graph, the band gap energy of Silicon is determined — expected to be close to the standard value of <strong>1.12 eV</strong>.</p>
+  </div>
+  <div class="card">
+    <div class="sec-label">Precautions</div>
+    <ol>
+      <li>Ensure the four probes are <strong>collinear and equally spaced</strong> (s = 0.20 cm).</li>
+      <li>Apply <strong>minimum pressure</strong> to the probes — excessive force cracks the chip.</li>
+      <li>Always pass current through <strong>outer probes (P1, P4)</strong> and measure voltage across <strong>inner probes (P2, P3)</strong>.</li>
+      <li>Keep the current <strong>constant at I = 5 mA</strong> throughout; do not adjust between readings.</li>
+      <li>Allow temperature to <strong>stabilise (~2 min)</strong> at each step before recording.</li>
+      <li>Do not exceed <strong>200°C</strong> — specimen may be permanently damaged.</li>
+      <li>Use a <strong>regulated DC constant current source</strong>.</li>
+      <li>Ensure <strong>good thermal contact</strong> between thermocouple and specimen holder.</li>
+      <li>Avoid <strong>vibrations</strong> during measurements.</li>
+      <li>Take at least <strong>14–16 readings</strong> for a reliable regression.</li>
+    </ol>
+  </div>
+  <div class="card">
+    <div class="sec-label">Sources of Error</div>
+    <ul>
+      <li>Non-uniform probe contact pressure — variable contact resistance.</li>
+      <li>Thermal lag between heater and specimen — stabilisation time too short.</li>
+      <li>Slightly unequal probe spacing.</li>
+      <li>Electromagnetic interference on millivoltmeter leads.</li>
+      <li>Oxide layer or surface contamination on the specimen.</li>
+      <li>Current source drift over time.</li>
+    </ul>
+  </div>
+</div>
+
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+const TITLES = {
+  home:'Overview', theory:'Aim & Theory', apparatus:'Apparatus',
+  procedure:'Procedure', simulation:'Simulation', observation:'Observation Table',
+  calculation:'Calculation', graph:'Graph', result:'Result & Precautions'
+};
+
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(a => {
+    if (a.getAttribute('onclick') === "show('" + id + "')") a.classList.add('active');
+  });
+  document.getElementById('page-heading').textContent = TITLES[id] || id;
+  if (id === 'simulation') { setTimeout(runSim, 50); }
+  if (id === 'graph')      { setTimeout(drawGraph, 50); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  PHYSICS ENGINE  (pure JS — no server needed)
+// ═══════════════════════════════════════════════════════
+const K_EV = 8.617e-5, EG_SI = 1.12, RHO0 = 0.0012;
+
+function simRho(T_K)      { return RHO0 * Math.exp(EG_SI / (2 * K_EV * T_K)); }
+function simV(rho,I,W)    { return I * 1e-3 * (rho * Math.log(2) / (Math.PI * W)) * 1e3; }
+function calcRho(V,I,W)   { var R=(V*1e-3)/(I*1e-3); return {R:R, rho:R*Math.PI*W/Math.log(2)}; }
+function fmt(n,d)          { return (n===null||isNaN(n))?"—":Number(n).toFixed(d||4); }
+
+function linreg(xs, ys) {
+  var n=xs.length, sx=0,sy=0,sxy=0,sx2=0;
+  xs.forEach(function(x,i){sx+=x;sy+=ys[i];sxy+=x*ys[i];sx2+=x*x;});
+  var d=n*sx2-sx*sx; if(!d) return null;
+  var m=(n*sxy-sx*sy)/d, b=(sy-m*sx)/n;
+  var ss_res=0,ss_tot=0,my=sy/n;
+  xs.forEach(function(x,i){ss_res+=Math.pow(ys[i]-(m*x+b),2);ss_tot+=Math.pow(ys[i]-my,2);});
+  return {slope:m, intercept:b, r2:ss_tot?1-ss_res/ss_tot:1};
+}
+
+// ═══════════════════════════════════════════════════════
+//  SIMULATION
+// ═══════════════════════════════════════════════════════
+var _simLast = {};
+
+function runSim() {
+  var T = parseFloat(document.getElementById('ctrl-T').value);
+  var I = parseFloat(document.getElementById('ctrl-I').value);
+  var W = parseFloat(document.getElementById('ctrl-W').value);
+  document.getElementById('dT').textContent = T + ' K';
+  document.getElementById('dI').textContent = I.toFixed(1) + ' mA';
+  document.getElementById('dW').textContent = W.toFixed(2) + ' cm';
+  var rho = simRho(T), V = simV(rho, I, W), R = (V*1e-3)/(I*1e-3);
+  document.getElementById('m-V').textContent   = fmt(V,3);
+  document.getElementById('m-R').textContent   = fmt(R,3);
+  document.getElementById('m-rho').textContent = fmt(rho,4);
+  document.getElementById('m-iT').textContent  = fmt(1000/T,4);
+  document.getElementById('m-ln').textContent  = fmt(Math.log(rho),4);
+  document.getElementById('m-TC').textContent  = fmt(T-273.15,1);
+  _simLast = {T_C: T-273.15, V_mV: V, I_mA: I};
+  drawCircuit(I, T, V, W);
+}
+
+function recordFromSim() {
+  if (!_simLast.V_mV) { showMsg('sim-msg','Run simulation first','err'); return; }
+  addObsRowValues(_simLast.T_C.toFixed(1), _simLast.V_mV.toFixed(3));
+  show('observation');
+  showMsg('obs-msg', '✓ Reading imported from Simulation.', 'ok');
+}
+
+// ── Canvas circuit diagram ────────────────────────────
+function drawCircuit(I, T_K, V_mV, W_cm) {
+  var canvas = document.getElementById('sim-canvas');
+  if (!canvas) return;
+  var dpr = window.devicePixelRatio||1, Wp=canvas.offsetWidth, Hp=300;
+  canvas.width=Wp*dpr; canvas.height=Hp*dpr;
+  var ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#f8f8f5'; ctx.fillRect(0,0,Wp,Hp);
+  var t01=Math.min(1,Math.max(0,(T_K-300)/150));
+  ctx.fillStyle='rgba('+(Math.round(200*t01))+',0,'+(Math.round(60*(1-t01)))+',0.05)';
+  ctx.fillRect(0,0,Wp,Hp);
+  var cx=Wp/2, sY=Hp*.54, sH=46, sW=Math.min(Wp*.68,460), sX=cx-sW/2;
+  var gr=ctx.createLinearGradient(sX,sY,sX,sY+sH);
+  gr.addColorStop(0,'hsl('+(215-t01*185)+',55%,'+(55-t01*14)+'%)'); gr.addColorStop(1,'#ccc');
+  ctx.fillStyle=gr; ctx.shadowColor='rgba(0,0,0,.15)'; ctx.shadowBlur=10;
+  ctx.beginPath(); ctx.roundRect(sX,sY,sW,sH,6); ctx.fill();
+  ctx.shadowBlur=0; ctx.strokeStyle='#aaa'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.font='bold 13px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('Silicon Specimen (p-type)',cx,sY+19);
+  ctx.font='11px IBM Plex Mono,monospace'; ctx.fillStyle='rgba(255,255,255,.75)';
+  ctx.fillText('T = '+T_K.toFixed(0)+' K  ('+( T_K-273.15).toFixed(1)+'°C)  |  W = '+W_cm.toFixed(2)+' cm',cx,sY+36);
+  var pColors=['#e74c3c','#3b82f6','#22c55e','#f59e0b'];
+  var pLabels=['P1 (I⁺)','P2 (V⁺)','P3 (V⁻)','P4 (I⁻)'];
+  var step=sW/5, pTop=sY-68;
+  var pX=[sX+step,sX+2*step,sX+3*step,sX+4*step];
+  pX.forEach(function(px,i){
+    ctx.strokeStyle=pColors[i]; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(px,pTop+28); ctx.lineTo(px,sY); ctx.stroke();
+    ctx.fillStyle=pColors[i];
+    ctx.beginPath(); ctx.arc(px,sY,5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(px-11,pTop+8,22,20,4); ctx.fill();
+    ctx.font='9px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(pLabels[i],px,pTop+3);
+  });
+  // CCS box left
+  var csX=sX-55;
+  ctx.strokeStyle='#e74c3c'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pX[0],pTop+18); ctx.lineTo(pX[0],pTop-8); ctx.lineTo(csX+38,pTop-8); ctx.stroke();
+  ctx.strokeStyle='#f59e0b';
+  ctx.beginPath(); ctx.moveTo(pX[3],pTop+18); ctx.lineTo(pX[3],pTop-26); ctx.lineTo(csX+38,pTop-26); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.strokeStyle='#e74c3c'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.roundRect(csX-36,pTop-48,74,38,5); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#e74c3c'; ctx.font='bold 9px IBM Plex Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('CCS',csX,pTop-34); ctx.fillText('I='+I.toFixed(1)+' mA',csX,pTop-22);
+  // DMV box right
+  var vmX=sX+sW+55;
+  ctx.strokeStyle='#3b82f6'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pX[1],pTop+18); ctx.lineTo(pX[1],pTop-48); ctx.lineTo(vmX,pTop-48); ctx.stroke();
+  ctx.strokeStyle='#22c55e';
+  ctx.beginPath(); ctx.moveTo(pX[2],pTop+18); ctx.lineTo(pX[2],pTop-58); ctx.lineTo(vmX,pTop-58); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.strokeStyle='#3b82f6'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.roundRect(vmX-36,pTop-78,74,38,5); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#3b82f6'; ctx.font='bold 9px IBM Plex Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('DMV',vmX,pTop-64); ctx.fillText('V='+V_mV.toFixed(2)+' mV',vmX,pTop-52);
+  // Spacing indicator
+  ctx.strokeStyle='#bbb'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(pX[0],sY+sH+10); ctx.lineTo(pX[3],sY+sH+10); ctx.stroke();
+  ctx.setLineDash([]); ctx.fillStyle='#999'; ctx.font='10px IBM Plex Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('s = 0.20 cm  (equal probe spacing)',cx,sY+sH+24);
+}
+
+// ═══════════════════════════════════════════════════════
+//  OBSERVATION TABLE
+// ═══════════════════════════════════════════════════════
+var obsCount = 0;
+
+function addObsRow(T_c, V_mV) {
+  T_c  = (T_c  === undefined) ? '' : T_c;
+  V_mV = (V_mV === undefined) ? '' : V_mV;
+  obsCount++;
+  var n = obsCount;
+  var tbody = document.getElementById('obs-body');
+  var tr = document.createElement('tr');
+  tr.id = 'orow-'+n;
+  tr.innerHTML =
+    '<td>'+n+'</td>'+
+    '<td class="inp"><input type="number" step="0.1" value="'+T_c+'" onchange="recalcRow('+n+')" placeholder="°C"/></td>'+
+    '<td class="auto" id="otk-'+n+'">—</td>'+
+    '<td class="auto" id="oit-'+n+'">—</td>'+
+    '<td class="inp"><input type="number" step="0.001" value="'+V_mV+'" onchange="recalcRow('+n+')" placeholder="mV"/></td>'+
+    '<td class="auto" id="oia-'+n+'">—</td>'+
+    '<td class="auto" id="orr-'+n+'">—</td>'+
+    '<td class="auto" id="orh-'+n+'">—</td>'+
+    '<td class="auto" id="olr-'+n+'">—</td>';
+  tbody.appendChild(tr);
+  if (T_c !== '' && V_mV !== '') recalcRow(n);
+}
+
+function addObsRowValues(T_c, V_mV) { addObsRow(T_c, V_mV); }
+
+function removeObsRow() {
+  if (!obsCount) return;
+  var tr = document.getElementById('orow-'+obsCount);
+  if (tr) tr.remove();
+  obsCount--;
+}
+
+function clearObs() {
+  document.getElementById('obs-body').innerHTML = '';
+  obsCount = 0;
+  showMsg('obs-msg','Table cleared.','ok');
+}
+
+function recalcRow(n) {
+  var tr = document.getElementById('orow-'+n); if(!tr) return;
+  var inp = tr.querySelectorAll('input');
+  var T_C  = parseFloat(inp[0].value);
+  var V_mV = parseFloat(inp[1].value);
+  var I    = parseFloat(document.getElementById('obs-I').value);
+  var W    = parseFloat(document.getElementById('obs-W').value);
+  function set(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+  if (!isNaN(T_C)) {
+    var T_K = T_C+273.15;
+    set('otk-'+n, T_K.toFixed(2));
+    set('oit-'+n, (1000/T_K).toFixed(5));
+  }
+  set('oia-'+n, I.toFixed(1));
+  if (!isNaN(V_mV) && !isNaN(I) && !isNaN(W) && I>0) {
+    var c = calcRho(V_mV, I, W);
+    set('orr-'+n, c.R.toFixed(6));
+    set('orh-'+n, c.rho.toFixed(6));
+    set('olr-'+n, Math.log(c.rho).toFixed(6));
+  }
+}
+
+function recalcAll() {
+  for (var i=1;i<=obsCount;i++) recalcRow(i);
+  showMsg('obs-msg','✓ All rows recalculated.','ok');
+}
+
+var SAMPLE_DATA = [
+  [27.0,12.485],[35.0,10.721],[45.0,8.843],[55.0,7.102],
+  [65.0,5.588],[75.0,4.321],[85.0,3.287],[95.0,2.451],
+  [105.0,1.803],[115.0,1.302],[125.0,0.924],[135.0,0.648],
+  [145.0,0.446],[155.0,0.304],[165.0,0.204],[175.0,0.136]
+];
+
+function loadSample() {
+  document.getElementById('obs-body').innerHTML=''; obsCount=0;
+  document.getElementById('obs-I').value=5;
+  document.getElementById('obs-W').value=0.05;
+  SAMPLE_DATA.forEach(function(r){ addObsRow(r[0],r[1]); });
+  showMsg('obs-msg','✓ Authentic sample data loaded (p-Si, I=5mA, W=0.05cm).','ok');
+}
+
+function getObsPoints() {
+  var pts = [];
+  for (var i=1;i<=obsCount;i++){
+    var it = document.getElementById('oit-'+i);
+    var lr = document.getElementById('olr-'+i);
+    if (it && lr && it.textContent!=='—' && lr.textContent!=='—'){
+      pts.push({x:parseFloat(it.textContent), y:parseFloat(lr.textContent)});
+    }
+  }
+  return pts;
+}
+
+function exportCSV() {
+  var I=document.getElementById('obs-I').value, W=document.getElementById('obs-W').value;
+  var csv='Four-Probe Method Virtual Lab\nI='+I+' mA  W='+W+' cm\n\n';
+  csv+='Sl,T(C),T(K),1/T*1000,V(mV),I(mA),R(Ohm),Rho(Ohm.cm),ln(rho)\n';
+  for(var i=1;i<=obsCount;i++){
+    var tr=document.getElementById('orow-'+i); if(!tr) continue;
+    var inp=tr.querySelectorAll('input');
+    csv+=[i,inp[0].value,
+      (document.getElementById('otk-'+i)||{}).textContent||'',
+      (document.getElementById('oit-'+i)||{}).textContent||'',
+      inp[1].value,
+      (document.getElementById('oia-'+i)||{}).textContent||'',
+      (document.getElementById('orr-'+i)||{}).textContent||'',
+      (document.getElementById('orh-'+i)||{}).textContent||'',
+      (document.getElementById('olr-'+i)||{}).textContent||''
+    ].join(',')+'\n';
+  }
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='four_probe_observations.csv'; a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+//  CALCULATION
+// ═══════════════════════════════════════════════════════
+function cbox(l,e){ return '<div class="calc-box"><div class="clabel">'+l+'</div><div class="ceq">'+e+'</div></div>'; }
+
+function liveCalc() {
+  var V=parseFloat(document.getElementById('c-V').value);
+  var I=parseFloat(document.getElementById('c-I').value);
+  var W=parseFloat(document.getElementById('c-W').value);
+  var T=parseFloat(document.getElementById('c-T').value);
+  var div=document.getElementById('calc-steps');
+  if(isNaN(V)||isNaN(I)||isNaN(W)||I===0){div.innerHTML='';return;}
+  var Vv=V*1e-3,Ia=I*1e-3,R=Vv/Ia,rho=R*Math.PI*W/Math.log(2),lnr=Math.log(rho);
+  var invT=(!isNaN(T)&&T>0)?(1000/T).toFixed(5):'—';
+  div.innerHTML=
+    cbox('Step 1 — Unit Conversion','V='+V+' mV='+Vv.toExponential(4)+' V | I='+I+' mA='+Ia.toExponential(4)+' A')+
+    cbox('Step 2 — Resistance','R=V/I='+Vv.toExponential(4)+'/'+Ia.toExponential(4)+'=<strong>'+R.toFixed(6)+' Ω</strong>')+
+    cbox('Step 3 — Resistivity','ρ=R×π×W/ln2=<strong>'+rho.toFixed(6)+' Ω·cm</strong>')+
+    cbox('Step 4 — Natural Log','ln(ρ)=ln('+rho.toFixed(4)+')=<strong>'+lnr.toFixed(6)+'</strong>')+
+    (!isNaN(T)&&T>0?cbox('Step 5 — Inverse Temp','1000/'+T+'=<strong>'+invT+' K⁻¹</strong>'):'')+
+    '<div class="result-display"><span class="rl">Resistivity ρ</span><span class="rv">'+rho.toFixed(6)+'</span><span class="ru">Ω·cm</span></div>';
+}
+
+function calcEg() {
+  var slope=parseFloat(document.getElementById('c-slope').value);
+  var div=document.getElementById('eg-result');
+  if(isNaN(slope)){div.innerHTML='';return;}
+  var Eg=2*K_EV*Math.abs(slope), err=Math.abs(Eg-EG_SI)/EG_SI*100;
+  div.innerHTML=
+    cbox('Band Gap','Eg=2×8.617×10⁻⁵×|'+Math.abs(slope).toFixed(1)+'|=<strong>'+Eg.toFixed(4)+' eV</strong>')+
+    '<div class="result-display"><span class="rl">Band Gap Energy (Eg)</span><span class="rv">'+Eg.toFixed(4)+'</span><span class="ru">eV</span>'+
+    '<span style="display:block;margin-top:6px;font-size:.68rem;color:#888">Standard Si: 1.12 eV | Error: '+err.toFixed(2)+'%</span></div>';
+}
+
+// ═══════════════════════════════════════════════════════
+//  GRAPH
+// ═══════════════════════════════════════════════════════
+function drawGraph() {
+  var canvas=document.getElementById('graph-canvas'); if(!canvas) return;
+  var dpr=window.devicePixelRatio||1, Wp=canvas.offsetWidth, Hp=420;
+  canvas.width=Wp*dpr; canvas.height=Hp*dpr;
+  var ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,Wp,Hp);
+  var pad={top:40,right:40,bottom:64,left:78};
+  var gW=Wp-pad.left-pad.right, gH=Hp-pad.top-pad.bottom;
+  var pts=getObsPoints();
+  if(pts.length<2){
+    ctx.fillStyle='#aaa'; ctx.font='14px DM Sans,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('No data — fill in the Observation Table first.',Wp/2,Hp/2); return;
+  }
+  var xs=pts.map(function(p){return p.x;}), ys=pts.map(function(p){return p.y;});
+  var xPad=(Math.max.apply(null,xs)-Math.min.apply(null,xs))*.08||.05;
+  var yPad=(Math.max.apply(null,ys)-Math.min.apply(null,ys))*.08||.5;
+  var xMin=Math.min.apply(null,xs)-xPad, xMax=Math.max.apply(null,xs)+xPad;
+  var yMin=Math.min.apply(null,ys)-yPad, yMax=Math.max.apply(null,ys)+yPad;
+  function cx(x){return pad.left+(x-xMin)/(xMax-xMin)*gW;}
+  function cy(y){return pad.top+(1-(y-yMin)/(yMax-yMin))*gH;}
+  // Grid
+  ctx.strokeStyle='#f0f0ee'; ctx.lineWidth=1;
+  for(var g=0;g<=6;g++){var xx=pad.left+g/6*gW; ctx.beginPath();ctx.moveTo(xx,pad.top);ctx.lineTo(xx,pad.top+gH);ctx.stroke();}
+  for(var g=0;g<=5;g++){var yy=pad.top+g/5*gH; ctx.beginPath();ctx.moveTo(pad.left,yy);ctx.lineTo(pad.left+gW,yy);ctx.stroke();}
+  // Axes
+  ctx.strokeStyle='#222'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad.left,pad.top); ctx.lineTo(pad.left,pad.top+gH); ctx.lineTo(pad.left+gW,pad.top+gH); ctx.stroke();
+  // Tick labels
+  ctx.fillStyle='#888'; ctx.font='10px IBM Plex Mono,monospace';
+  ctx.textAlign='center';
+  for(var g=0;g<=6;g++){ctx.fillText((xMin+(xMax-xMin)*g/6).toFixed(3),pad.left+g*gW/6,pad.top+gH+16);}
+  ctx.textAlign='right';
+  for(var g=0;g<=5;g++){ctx.fillText((yMax-(yMax-yMin)*g/5).toFixed(2),pad.left-7,pad.top+g*gH/5+4);}
+  // Axis labels
+  ctx.fillStyle='#555'; ctx.font='11px IBM Plex Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('1/T × 10³  (K⁻¹)',pad.left+gW/2,Hp-10);
+  ctx.save(); ctx.translate(16,pad.top+gH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('ln(ρ)  [ρ in Ω·cm]',0,0); ctx.restore();
+  // Regression line
+  var reg=linreg(xs,ys);
+  if(reg){
+    ctx.strokeStyle='#b5291c'; ctx.lineWidth=2; ctx.setLineDash([8,4]);
+    ctx.beginPath(); ctx.moveTo(cx(xMin),cy(reg.slope*xMin+reg.intercept));
+    ctx.lineTo(cx(xMax),cy(reg.slope*xMax+reg.intercept)); ctx.stroke(); ctx.setLineDash([]);
+  }
+  // Points
+  pts.forEach(function(p){
+    ctx.fillStyle='#181818'; ctx.strokeStyle='#b5291c'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(cx(p.x),cy(p.y),5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  });
+  // Title
+  ctx.fillStyle='#181818'; ctx.font='bold 12px DM Sans,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('ln(ρ) vs 1/T — Four-Probe Method (Silicon)',pad.left+gW/2,pad.top-14);
+  // Info
+  if(reg){
+    var slope_K=reg.slope*1000, Eg=2*K_EV*Math.abs(slope_K);
+    document.getElementById('graph-info').textContent=
+      'Slope = '+reg.slope.toFixed(4)+' (×10³ axis)  |  Slope_K = '+slope_K.toFixed(1)+' K  |  Eg = '+Eg.toFixed(4)+' eV  |  R² = '+reg.r2.toFixed(4);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  RESULT
+// ═══════════════════════════════════════════════════════
+function computeResult() {
+  var pts=getObsPoints();
+  if(pts.length<2){showMsg('','No data','err');return;}
+  var rhoRT_el=document.getElementById('orh-1');
+  var rhoRT=rhoRT_el?parseFloat(rhoRT_el.textContent):null;
+  var xs=pts.map(function(p){return p.x;}), ys=pts.map(function(p){return p.y;});
+  var reg=linreg(xs,ys);
+  var slope_K=reg.slope*1000, Eg=2*K_EV*Math.abs(slope_K);
+  var err=Math.abs(Eg-EG_SI)/EG_SI*100;
+  var html='<div class="info-grid">'+
+    '<div class="info-tile"><div class="tile-label">ρ at Room Temp</div><div class="tile-val">'+(rhoRT?rhoRT.toFixed(4):'—')+' Ω·cm</div></div>'+
+    '<div class="info-tile"><div class="tile-label">Band Gap Eg</div><div class="tile-val">'+Eg.toFixed(4)+' eV</div></div>'+
+    '<div class="info-tile"><div class="tile-label">Standard Eg (Si)</div><div class="tile-val">'+EG_SI+' eV</div></div>'+
+    '<div class="info-tile"><div class="tile-label">% Error</div><div class="tile-val">'+err.toFixed(2)+'%</div></div>'+
+    '<div class="info-tile"><div class="tile-label">Slope_K</div><div class="tile-val">'+slope_K.toFixed(1)+' K</div></div>'+
+    '<div class="info-tile"><div class="tile-label">R² (fit quality)</div><div class="tile-val">'+reg.r2.toFixed(4)+'</div></div>'+
+    '</div>'+
+    '<div class="result-display" style="margin-top:16px"><span class="rl">Band Gap Energy of Silicon</span>'+
+    '<span class="rv">'+Eg.toFixed(4)+'</span><span class="ru">eV</span>'+
+    '<span style="display:block;margin-top:6px;font-size:.68rem;color:#888">Standard: '+EG_SI+' eV | Error: '+err.toFixed(2)+'% | Readings: '+pts.length+'</span></div>';
+  document.getElementById('result-content').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILITY
+// ═══════════════════════════════════════════════════════
+function showMsg(id, text, type) {
+  var el=document.getElementById(id); if(!el) return;
+  el.textContent=text; el.className='msg '+(type||'ok');
+  setTimeout(function(){el.className='msg';},3500);
+}
+
+// Init
+window.addEventListener('load', function(){ runSim(); });
+window.addEventListener('resize', function(){
+  if(document.getElementById('panel-simulation').classList.contains('active')) runSim();
+  if(document.getElementById('panel-graph').classList.contains('active')) drawGraph();
+});
+</script>
+</body>
+</html>
