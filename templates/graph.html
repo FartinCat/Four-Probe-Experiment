@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Graph — Four-Probe Lab{% endblock %}
+{% block heading %}Graph: ln(&#961;) vs 1/T{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="section-label">ln(&#961;) vs 1/T &times; 10&#179; Plot</div>
+  <p style="color:var(--muted);font-size:0.88rem;margin-bottom:14px;">
+    Data is read from your saved Observation Table. Save data there first, then reload this page.
+  </p>
+  <canvas id="graph-canvas" height="420"></canvas>
+  <div id="graph-info" style="margin-top:14px;font-family:var(--mono);font-size:0.83rem;color:var(--accent);min-height:20px;"></div>
+</div>
+
+<div class="card">
+  <div class="section-label">How to Read the Graph</div>
+  <ul>
+    <li>Each <strong>black dot</strong> is one observation: x&nbsp;=&nbsp;1/T&nbsp;&times;&nbsp;10&#179;, y&nbsp;=&nbsp;ln(&#961;).</li>
+    <li>The <span style="color:#b5291c;font-weight:600;">red dashed line</span> is the best-fit linear regression (least-squares).</li>
+    <li><strong>Slope</strong> of the line&nbsp;=&nbsp;E<sub>g</sub>&nbsp;/&nbsp;(2k). The value is displayed below the graph.</li>
+    <li><strong>E<sub>g</sub></strong>&nbsp;=&nbsp;2&nbsp;&times;&nbsp;k&nbsp;&times;&nbsp;|slope|&nbsp;=&nbsp;2&nbsp;&times;&nbsp;8.617&times;10&#8315;&#8309;&nbsp;&times;&nbsp;|slope<sub>K</sub>| eV</li>
+    <li>For p-type Si the slope should be approximately 6500&nbsp;K, giving E<sub>g</sub>&nbsp;&asymp;&nbsp;1.12&nbsp;eV.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <div class="section-label">Inference</div>
+  <p>
+    As temperature increases, the resistivity of Silicon <strong>decreases</strong> (negative temperature coefficient),
+    confirming semiconductor behaviour. The linear relationship of ln(&#961;) vs 1/T validates the
+    exponential model &#961;&nbsp;=&nbsp;&#961;&#8320;&nbsp;exp(E<sub>g</sub>/2kT).
+    The slope of the graph gives the band gap energy E<sub>g</sub> of Silicon.
+  </p>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var PTS = {{ pts|safe }};
+  var REG = {{ reg|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/graph.js') }}"></script>
+{% endblock %}

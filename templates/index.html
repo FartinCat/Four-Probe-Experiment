@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Four-Probe Virtual Lab — Overview{% endblock %}
+{% block heading %}Overview{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-main">
+        <h2>Four-Probe Method<br>Virtual Laboratory</h2>
+        <p>Measure the resistivity of a Silicon semiconductor specimen and determine its band gap energy using the
+            Four-Probe technique — simulated with authentic physics.</p>
+        <a href="/simulation" class="btn btn-primary">▶ Start Simulation</a>
+        <a href="/theory" class="btn btn-secondary" style="margin-left:8px;">Read Theory</a>
+    </div>
+    <div class="hero-aside">
+        <div class="stat-box">
+            <div class="sv">1.12 eV</div>
+            <div class="sl">Si Band Gap (Standard)</div>
+        </div>
+        <div class="stat-box">
+            <div class="sv">~10 Ω·cm</div>
+            <div class="sl">ρ at Room Temp</div>
+        </div>
+        <div class="stat-box">
+            <div class="sv">300–450 K</div>
+            <div class="sl">Temperature Range</div>
+        </div>
+    </div>
+</div>
+
+<div class="section-label">Navigate the Lab</div>
+<div class="nav-cards">
+    <a href="/theory" class="nav-card">
+        <div class="nc-icon">📐</div>
+        <div class="nc-title">Aim & Theory</div>
+        <div class="nc-desc">Four-probe principle, resistivity formula, band gap derivation</div>
+    </a>
+    <a href="/apparatus" class="nav-card">
+        <div class="nc-icon">🔬</div>
+        <div class="nc-title">Apparatus</div>
+        <div class="nc-desc">Instruments, specimen specs, and setup details</div>
+    </a>
+    <a href="/procedure" class="nav-card">
+        <div class="nc-icon">📋</div>
+        <div class="nc-title">Procedure</div>
+        <div class="nc-desc">Step-by-step experimental instructions</div>
+    </a>
+    <a href="/simulation" class="nav-card">
+        <div class="nc-icon">⚡</div>
+        <div class="nc-title">Simulation</div>
+        <div class="nc-desc">Interactive circuit with live physics engine</div>
+    </a>
+    <a href="/observation" class="nav-card">
+        <div class="nc-icon">📊</div>
+        <div class="nc-title">Observation Table</div>
+        <div class="nc-desc">Enter data, auto-calculate ρ and ln(ρ)</div>
+    </a>
+    <a href="/graph" class="nav-card">
+        <div class="nc-icon">📈</div>
+        <div class="nc-title">Graph & Result</div>
+        <div class="nc-desc">ln(ρ) vs 1/T plot with regression and Eg</div>
+    </a>
+</div>
+{% endblock %}

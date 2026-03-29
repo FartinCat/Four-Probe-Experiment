@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Theory — Four-Probe Lab{% endblock %}
+{% block heading %}Aim &amp; Theory{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="section-label">Aim of the Experiment</div>
+    <h2>To measure the resistivity of a semiconductor (Silicon) specimen using the Four-Probe Method and to study its
+        variation with temperature.</h2>
+    <div class="info-grid">
+        <div class="info-tile">
+            <div class="tile-label">Specimen</div>
+            <div class="tile-val">p-type Silicon</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Method</div>
+            <div class="tile-val">Four-Probe</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Measured Qty.</div>
+            <div class="tile-val">Resistivity (ρ)</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Temperature Range</div>
+            <div class="tile-val">300 K – 450 K</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Probe Spacing (s)</div>
+            <div class="tile-val">0.20 cm</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Specimen Thickness (W)</div>
+            <div class="tile-val">0.05 cm</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="section-label">Why Four Probes?</div>
+    <p>In a conventional two-probe measurement the <strong>contact resistance</strong> between probe tips and the
+        specimen adds to the measured resistance, introducing large systematic errors — especially problematic in
+        semiconductors where bulk resistance can be comparable to contact resistance.</p>
+    <div class="divider"></div>
+    <p>The <strong>Four-Probe Method</strong> eliminates this error by separating current injection from voltage
+        sensing:</p>
+    <ul style="margin-top:10px;">
+        <li><strong>Outer probes (P1 &amp; P4)</strong> carry the current I.</li>
+        <li><strong>Inner probes (P2 &amp; P3)</strong> measure voltage V — <em>no current flows through them</em>, so
+            their contact resistance does not affect the reading.</li>
+    </ul>
+</div>
+
+<div class="card">
+    <div class="section-label">Resistivity Formula</div>
+    <p>For a semiconductor specimen of thickness <em>W</em> with equally spaced collinear probes (spacing <em>s</em>),
+        the resistivity is:</p>
+    <div class="formula">
+        ρ = (V / I) × 2πs × f(W/s)<br>
+        <small>f(W/s) = geometrical correction factor</small>
+    </div>
+    <p>For a <strong>thin specimen</strong> (W ≪ s, i.e., W/s &lt; 0.5), the formula simplifies to:</p>
+    <div class="formula">
+        ρ = (V / I) × (π W / ln 2)<br>
+        <small>ρ in Ω·cm | W in cm | V in Volts | I in Amperes</small>
+    </div>
+    <p style="margin-top:10px;">This lab uses: W = 0.05 cm, s = 0.20 cm → W/s = 0.25 ✓ (thin-sample regime)</p>
+</div>
+
+<div class="card">
+    <div class="section-label">Temperature Dependence &amp; Band Gap</div>
+    <p>For an intrinsic semiconductor, resistivity varies exponentially with temperature:</p>
+    <div class="formula">
+        ρ(T) = ρ₀ · exp(Eg / 2kT)<br>
+        <small>Eg = band gap energy (eV) | k = 8.617×10⁻⁵ eV/K | T = absolute temperature (K)</small>
+    </div>
+    <p>Taking the natural logarithm:</p>
+    <div class="formula">
+        ln(ρ) = ln(ρ₀) + (Eg / 2k) · (1/T)
+    </div>
+    <p>A plot of <strong>ln(ρ)</strong> versus <strong>1/T</strong> is a straight line with:</p>
+    <ul style="margin-top:10px;">
+        <li><strong>Slope</strong> = Eg / (2k)</li>
+        <li><strong>Therefore:</strong> Eg = 2k × |slope|</li>
+    </ul>
+    <div class="formula">
+        Eg = 2 × 8.617×10⁻⁵ × |slope|&nbsp;&nbsp;eV<br>
+        <small>where slope is in Kelvin (from ln(ρ) vs 1/T in K⁻¹)</small>
+    </div>
+</div>
+
+<div class="card">
+    <div class="section-label">Key Physical Quantities</div>
+    <span class="badge">ρ — Resistivity (Ω·cm)</span>
+    <span class="badge">V — Voltage, inner probes (mV)</span>
+    <span class="badge">I — Current, outer probes (mA)</span>
+    <span class="badge">W — Thickness (cm)</span>
+    <span class="badge">s — Probe spacing (cm)</span>
+    <span class="badge">T — Temperature (K)</span>
+    <span class="badge">Eg — Band gap (eV)</span>
+    <span class="badge">k — Boltzmann constant</span>
+    <span class="badge">R = V/I — Resistance (Ω)</span>
+</div>
+
+{% endblock %}

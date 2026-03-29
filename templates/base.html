@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Four-Probe Virtual Lab{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">⬡</span>
+            <span class="brand-text">Four-Probe<br><small>Virtual Lab</small></span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-link {% if request.path=='/' %}active{% endif %}">
+                <span class="nav-icon">⌂</span> Overview
+            </a>
+            <a href="/theory" class="nav-link {% if request.path=='/theory' %}active{% endif %}">
+                <span class="nav-icon">📐</span> Aim & Theory
+            </a>
+            <a href="/apparatus" class="nav-link {% if request.path=='/apparatus' %}active{% endif %}">
+                <span class="nav-icon">🔬</span> Apparatus
+            </a>
+            <a href="/procedure" class="nav-link {% if request.path=='/procedure' %}active{% endif %}">
+                <span class="nav-icon">📋</span> Procedure
+            </a>
+            <a href="/simulation" class="nav-link {% if request.path=='/simulation' %}active{% endif %}">
+                <span class="nav-icon">⚡</span> Simulation
+            </a>
+            <a href="/observation" class="nav-link {% if request.path=='/observation' %}active{% endif %}">
+                <span class="nav-icon">📊</span> Observation
+            </a>
+            <a href="/calculation" class="nav-link {% if request.path=='/calculation' %}active{% endif %}">
+                <span class="nav-icon">🧮</span> Calculation
+            </a>
+            <a href="/graph" class="nav-link {% if request.path=='/graph' %}active{% endif %}">
+                <span class="nav-icon">📈</span> Graph
+            </a>
+            <a href="/result" class="nav-link {% if request.path=='/result' %}active{% endif %}">
+                <span class="nav-icon">✅</span> Result
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <span class="mono-sm">Semiconductor Physics</span>
+        </div>
+    </aside>
+
+    <div class="main-wrap">
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <h1 class="page-heading">{% block heading %}{% endblock %}</h1>
+            </div>
+            <div class="top-bar-right mono-sm">
+                Si | W = 0.05 cm | s = 0.20 cm | I = 5 mA
+            </div>
+        </header>
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

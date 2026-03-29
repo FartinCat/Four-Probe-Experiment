@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Apparatus — Four-Probe Lab{% endblock %}
+{% block heading %}Apparatus{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="section-label">Instruments Required</div>
+    <ul>
+        <li>Four-Probe Apparatus (probe unit with spring-loaded tungsten tips)</li>
+        <li>Constant Current Source — DC, regulated (0 – 200 mA)</li>
+        <li>Digital Millivoltmeter / Nanovoltmeter (resolution: 0.001 mV)</li>
+        <li>Digital Milliammeter (resolution: 0.01 mA)</li>
+        <li>Thermocouple (type K) with digital temperature indicator (±0.5°C)</li>
+        <li>Programmable Oven / Furnace (25°C – 250°C) with PID temperature controller</li>
+    </ul>
+</div>
+
+<div class="card">
+    <div class="section-label">Components &amp; Materials</div>
+    <ul>
+        <li>Silicon semiconductor specimen (p-type chip / wafer)</li>
+        <li>Four collinear tungsten probe tips (equal spacing, spring-loaded)</li>
+        <li>Probe holder with micrometer-controlled vertical adjustment</li>
+        <li>Sample holder with integrated heater coil</li>
+        <li>Connecting leads — 4 mm banana plugs, colour-coded</li>
+        <li>Insulating base plate (Teflon / alumina)</li>
+    </ul>
+</div>
+
+<div class="card">
+    <div class="section-label">Silicon Specimen Specifications</div>
+    <div class="info-grid">
+        <div class="info-tile">
+            <div class="tile-label">Material</div>
+            <div class="tile-val">p-type Si</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Thickness W</div>
+            <div class="tile-val">0.05 cm</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Probe spacing s</div>
+            <div class="tile-val">0.20 cm</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">W/s ratio</div>
+            <div class="tile-val">0.25 (thin regime)</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">ρ at room temp</div>
+            <div class="tile-val">~10 Ω·cm</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Band gap (Si)</div>
+            <div class="tile-val">1.12 eV</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Constant current I</div>
+            <div class="tile-val">5.0 mA</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Temp. range</div>
+            <div class="tile-val">27°C – 175°C</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Probe material</div>
+            <div class="tile-val">Tungsten (W)</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="section-label">Circuit Schematic (Description)</div>
+    <p style="margin-bottom:10px;">The circuit consists of two independent loops:</p>
+    <ul>
+        <li><strong>Current Loop:</strong> Constant Current Source → P1 (outer) → Silicon Specimen → P4 (outer) → back
+            to source.</li>
+        <li><strong>Voltage Loop:</strong> Digital Millivoltmeter connected across P2 and P3 (inner probes). High input
+            impedance of voltmeter ensures negligible current through voltage probes.</li>
+    </ul>
+    <div class="step-note" style="margin-top:12px;">
+        ⚠ The probes must be arranged in strict collinear order: P1 – P2 – P3 – P4, with equal spacing s between
+        adjacent probes.
+    </div>
+</div>
+
+{% endblock %}

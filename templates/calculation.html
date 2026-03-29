@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Calculation — Four-Probe Lab{% endblock %}
+{% block heading %}Step-by-Step Calculation{% endblock %}
+
+{% block content %}
+
+<!-- ── Live Single-Row Calculator ───────────────────────── -->
+<div class="card">
+  <div class="section-label">Single-Row Calculator</div>
+  <p style="color:var(--muted);font-size:0.88rem;margin-bottom:14px;">
+    Enter any one row of readings to see the full calculation chain broken down step by step.
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:16px;">
+    <div class="igroup">
+      <label>Voltage V (mV)</label>
+      <input type="number" id="c-V" placeholder="e.g. 12.485" step="0.001" oninput="liveCalc()"/>
+    </div>
+    <div class="igroup">
+      <label>Current I (mA)</label>
+      <input type="number" id="c-I" placeholder="e.g. 5.0" step="0.5" oninput="liveCalc()"/>
+    </div>
+    <div class="igroup">
+      <label>Thickness W (cm)</label>
+      <input type="number" id="c-W" value="0.05" step="0.001" oninput="liveCalc()"/>
+    </div>
+    <div class="igroup">
+      <label>Temperature T (K)</label>
+      <input type="number" id="c-T" placeholder="e.g. 300.15" step="1" oninput="liveCalc()"/>
+    </div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="liveCalc()">Calculate</button>
+  <div id="calc-steps" style="margin-top:18px;"></div>
+</div>
+
+<!-- ── Band Gap Calculator ───────────────────────────────── -->
+<div class="card">
+  <div class="section-label">Band Gap Energy from Graph Slope</div>
+  <p style="margin-bottom:12px;color:var(--muted);font-size:0.88rem;">
+    After plotting ln(&#961;) vs 1/T on the Graph page, read the slope of the best-fit line and enter it here.
+  </p>
+  <div class="formula">
+    Slope = E<sub>g</sub> / (2k) &nbsp;&rarr;&nbsp; E<sub>g</sub> = 2 &times; k &times; |Slope|<br>
+    <small>k = 8.617&times;10&#8315;&#8309; eV/K &nbsp;|&nbsp; Slope must be in Kelvin (from 1/T in K&#8315;&#185; axis)</small>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-end;margin-top:16px;flex-wrap:wrap;">
+    <div class="igroup">
+      <label>Slope of ln(&#961;) vs 1/T graph (K)</label>
+      <input type="number" id="c-slope" placeholder="e.g. 6510" step="1" oninput="calcEg()"/>
+    </div>
+    <button class="btn btn-primary btn-sm" style="margin-bottom:1px;" onclick="calcEg()">Compute E<sub>g</sub></button>
+  </div>
+  <div id="eg-result" style="margin-top:14px;"></div>
+</div>
+
+<!-- ── Session Regression Results ───────────────────────── -->
+{% if reg and reg.Eg %}
+<div class="card">
+  <div class="section-label">Results Computed from Your Saved Observation Data</div>
+
+  <div class="calc-box">
+    <div class="clabel">Linear Regression &mdash; ln(&#961;) vs 1/T &times; 10&#179;</div>
+    <div class="ceq">
+      Slope (on &#215;10&#179; axis) = {{ reg.slope }} &nbsp;|&nbsp;
+      Slope in K = {{ reg.slope_K }} K &nbsp;|&nbsp;
+      Intercept = {{ reg.intercept }} &nbsp;|&nbsp;
+      R&#178; = {{ reg.r2 }}
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="clabel">Band Gap Energy</div>
+    <div class="ceq">
+      E<sub>g</sub> = 2 &times; 8.617&times;10&#8315;&#8309; &times; |{{ reg.slope_K }}|
+      = <strong>{{ reg.Eg }} eV</strong>
+      &nbsp;&nbsp;(Standard Si: {{ EG_SI }} eV &nbsp;|&nbsp; Error: {{ reg.err }}%)
+    </div>
+  </div>
+
+  <div class="result-display">
+    <span class="rl">Band Gap Energy (E<sub>g</sub>) of Silicon</span>
+    <span class="rv">{{ reg.Eg }}</span><span class="ru">eV</span>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Formula Reference Sheet ───────────────────────────── -->
+<div class="card">
+  <div class="section-label">Formula Reference Sheet</div>
+
+  <div class="calc-box">
+    <div class="clabel">Step 1 &mdash; Unit Conversion</div>
+    <div class="ceq">
+      V (V) = V (mV) &times; 10&#8315;&#179; &nbsp;&nbsp;
+      I (A) = I (mA) &times; 10&#8315;&#179; &nbsp;&nbsp;
+      T (K) = T (&deg;C) + 273.15
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="clabel">Step 2 &mdash; Resistance</div>
+    <div class="ceq">R (&Omega;) = V (V) / I (A)</div>
+  </div>
+
+  <div class="calc-box">
+    <div class="clabel">Step 3 &mdash; Resistivity (thin specimen, W/s &lt; 0.5)</div>
+    <div class="ceq">
+      &#961; (&Omega;&middot;cm) = R &times; &pi; &times; W / ln(2)
+      &nbsp;&nbsp; [&pi; = 3.14159, ln 2 = 0.69315, W in cm]
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="clabel">Step 4 &mdash; Natural Log &amp; Inverse Temperature</div>
+    <div class="ceq">
+      ln(&#961;) = log<sub>e</sub>(&#961;) &nbsp;&nbsp;&nbsp;
+      1/T &times; 10&#179; = 1000 / T (K)
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="clabel">Step 5 &mdash; Band Gap from Slope</div>
+    <div class="ceq">
+      slope<sub>K</sub> = slope<sub>graph</sub> &times; 10&#179; &nbsp;&nbsp;
+      E<sub>g</sub> = 2 &times; k &times; |slope<sub>K</sub>| = 2 &times; 8.617&times;10&#8315;&#8309; &times; |slope<sub>K</sub>| &nbsp;eV
+    </div>
+  </div>
+
+  <div class="calc-box">
+    <div class="clabel">Physical Constants</div>
+    <div class="ceq">
+      k (Boltzmann) = 8.617 &times; 10&#8315;&#8309; eV/K = 1.381 &times; 10&#8315;&#178;&#179; J/K &nbsp;|&nbsp;
+      ln(2) = 0.6931 &nbsp;|&nbsp; &pi; = 3.1416
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/calculation.js') }}"></script>
+{% endblock %}

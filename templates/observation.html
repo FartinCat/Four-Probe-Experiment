@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Observation — Four-Probe Lab{% endblock %}
+{% block heading %}Observation Table{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="section-label">Fixed Parameters</div>
+    <div class="obs-header">
+        <div class="igroup">
+            <label>Constant Current I (mA)</label>
+            <input type="number" id="obs-I" value="{{ I }}" step="0.5" min="0.1" max="50" />
+        </div>
+        <div class="igroup">
+            <label>Specimen Thickness W (cm)</label>
+            <input type="number" id="obs-W" value="{{ W }}" step="0.001" min="0.001" />
+        </div>
+        <div style="display:flex; flex-direction:column; justify-content:flex-end; gap:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="loadSample()">Load Sample Data</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearAll()">Clear Table</button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="section-label">
+        Observations &nbsp;
+        <span
+            style="font-family:var(--sans);font-size:0.75rem;color:var(--muted);text-transform:none;letter-spacing:0;">
+            — Enter T(°C) and V(mV); all other columns calculated automatically
+        </span>
+    </div>
+
+    <div class="table-wrap">
+        <table id="obs-table">
+            <thead>
+                <tr>
+                    <th>Sl.</th>
+                    <th>T<small>(°C) <span class="tag tag-in">input</span></small></th>
+                    <th>T<small>(K) <span class="tag tag-auto">auto</span></small></th>
+                    <th>1/T×10³<small>(K⁻¹) <span class="tag tag-auto">auto</span></small></th>
+                    <th>V<small>(mV) <span class="tag tag-in">input</span></small></th>
+                    <th>I<small>(mA) <span class="tag tag-auto">auto</span></small></th>
+                    <th>R = V/I<small>(Ω) <span class="tag tag-auto">auto</span></small></th>
+                    <th>ρ = R·πW/ln2<small>(Ω·cm) <span class="tag tag-auto">auto</span></small></th>
+                    <th>ln(ρ)<small><span class="tag tag-auto">auto</span></small></th>
+                </tr>
+            </thead>
+            <tbody id="obs-body">
+                {% if rows %}
+                {% for r in rows %}
+                <tr id="row-{{ loop.index }}">
+                    <td>{{ loop.index }}</td>
+                    <td class="inp"><input type="number" step="0.1" value="{{ r.T_C }}"
+                            onchange="recalcRow({{ loop.index }})" /></td>
+                    <td class="auto">{{ "%.2f"|format(r.T_K) }}</td>
+                    <td class="auto">{{ "%.5f"|format(r.inv_T) }}</td>
+                    <td class="inp"><input type="number" step="0.001" value="{{ r.V_mV }}"
+                            onchange="recalcRow({{ loop.index }})" /></td>
+                    <td class="auto">{{ "%.1f"|format(r.I_mA) }}</td>
+                    <td class="auto">{{ "%.6f"|format(r.R) }}</td>
+                    <td class="auto">{{ "%.6f"|format(r.rho) }}</td>
+                    <td class="auto">{{ "%.6f"|format(r.ln_rho) }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn btn-secondary btn-sm" onclick="addRow()">+ Add Row</button>
+        <button class="btn btn-secondary btn-sm" onclick="removeRow()">− Remove Last</button>
+        <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Save &amp; Recalculate</button>
+        <button class="btn btn-dark btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+    <div id="obs-msg" class="msg"></div>
+</div>
+
+<div class="card">
+    <div class="section-label">Formula Reference</div>
+    <div class="calc-box">
+        <div class="clabel">Resistance</div>
+        <div class="ceq">R (Ω) = V (V) / I (A) &nbsp;→&nbsp; convert: V_V = V_mV × 10⁻³, I_A = I_mA × 10⁻³</div>
+    </div>
+    <div class="calc-box">
+        <div class="clabel">Resistivity (thin specimen W/s &lt; 0.5)</div>
+        <div class="ceq">ρ (Ω·cm) = R × π × W / ln(2) &nbsp;=&nbsp; R × 3.14159 × 0.05 / 0.69315</div>
+    </div>
+    <div class="calc-box">
+        <div class="clabel">Natural Log</div>
+        <div class="ceq">ln(ρ) = loge(ρ)</div>
+    </div>
+    <div class="calc-box">
+        <div class="clabel">Inverse Temperature</div>
+        <div class="ceq">1/T × 10³ = 1000 / T(K)</div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/observation.js') }}"></script>
+{% endblock %}

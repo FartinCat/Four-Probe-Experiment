@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Result — Four-Probe Lab{% endblock %}
+{% block heading %}Result &amp; Precautions{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="section-label">Experimental Result</div>
+
+  {% if rho_rt %}
+  <div class="info-grid">
+    <div class="info-tile">
+      <div class="tile-label">Resistivity at Room Temp</div>
+      <div class="tile-val">{{ "%.4f"|format(rho_rt) }} &#937;&#183;cm</div>
+    </div>
+    {% if reg and reg.Eg %}
+    <div class="info-tile">
+      <div class="tile-label">Band Gap E<sub>g</sub> (Measured)</div>
+      <div class="tile-val">{{ reg.Eg }} eV</div>
+    </div>
+    <div class="info-tile">
+      <div class="tile-label">Standard E<sub>g</sub> (Si)</div>
+      <div class="tile-val">{{ EG_SI }} eV</div>
+    </div>
+    <div class="info-tile">
+      <div class="tile-label">Percentage Error</div>
+      <div class="tile-val">{{ reg.err }}%</div>
+    </div>
+    <div class="info-tile">
+      <div class="tile-label">Slope (K)</div>
+      <div class="tile-val">{{ reg.slope_K }}</div>
+    </div>
+    <div class="info-tile">
+      <div class="tile-label">R&#178; (Fit Quality)</div>
+      <div class="tile-val">{{ reg.r2 }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if reg and reg.Eg %}
+  <div class="result-display" style="margin-top:18px;">
+    <span class="rl">Band Gap Energy of Silicon (E<sub>g</sub>)</span>
+    <span class="rv">{{ reg.Eg }}</span><span class="ru">eV</span>
+    <span style="display:block;margin-top:8px;font-size:0.68rem;color:#888;">
+      Standard value: {{ EG_SI }} eV &nbsp;|&nbsp;
+      Percentage Error: {{ reg.err }}% &nbsp;|&nbsp;
+      Observations used: {{ rows|length }}
+    </span>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <p style="color:var(--muted);">
+    No observation data saved yet. Complete the Observation Table and click
+    <strong>Save &amp; Recalculate</strong>, then reload this page.
+  </p>
+  <a href="/observation" class="btn btn-primary btn-sm" style="margin-top:14px;">
+    &#8594; Go to Observation Table
+  </a>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="section-label">Conclusion</div>
+  <p>
+    The resistivity of the Silicon (p-type) specimen was measured using the Four-Probe Method
+    over a temperature range of 300&nbsp;K to 450&nbsp;K. The resistivity decreased exponentially
+    with increasing temperature, confirming semiconductor behaviour. From the slope of the
+    ln(&#961;) vs 1/T graph, the band gap energy of Silicon was determined to be
+    {% if reg and reg.Eg %}<strong>{{ reg.Eg }} eV</strong>{% else %}<strong>&#8212;</strong>{% endif %},
+    which is in close agreement with the standard value of <strong>1.12 eV</strong>.
+  </p>
+</div>
+
+<div class="card">
+  <div class="section-label">Precautions</div>
+  <ol>
+    <li>Ensure the four probes are <strong>collinear and equally spaced</strong> (s&nbsp;=&nbsp;0.20&nbsp;cm) before starting.</li>
+    <li>Apply <strong>minimum pressure</strong> to the probes &#8212; excessive force will crack the Silicon chip.</li>
+    <li>Always pass current through <strong>outer probes (P1, P4)</strong> and measure voltage across <strong>inner probes (P2, P3)</strong>.</li>
+    <li>Keep the current <strong>constant at I&nbsp;=&nbsp;5&nbsp;mA</strong> throughout; do not adjust between readings.</li>
+    <li>Allow the temperature to <strong>stabilise (~2 minutes)</strong> at each step before recording the voltage.</li>
+    <li>Do not exceed <strong>200&deg;C</strong> to prevent permanent damage to the specimen.</li>
+    <li>Use a <strong>regulated DC constant current source</strong> &#8212; AC supply gives erroneous results.</li>
+    <li>Ensure <strong>good thermal contact</strong> between the thermocouple and the specimen holder.</li>
+    <li>Avoid <strong>vibrations or mechanical disturbances</strong> during measurements.</li>
+    <li>Take at least <strong>14&#8211;16 readings</strong> for a reliable linear regression on the ln(&#961;) vs 1/T graph.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <div class="section-label">Sources of Error</div>
+  <ul>
+    <li>Non-uniform probe contact pressure causing variable and uncontrolled contact resistance.</li>
+    <li>Thermal lag between heater and specimen &#8212; stabilisation time too short between steps.</li>
+    <li>Slightly unequal probe spacing &#8212; calibrate the probe unit with a calibrated scale before the experiment.</li>
+    <li>Electromagnetic interference picked up by long millivoltmeter leads.</li>
+    <li>Oxide layer or surface contamination on the specimen surface at probe points.</li>
+    <li>Current source drift over time &#8212; verify I before every reading using the milliammeter.</li>
+  </ul>
+</div>
+
+{% endblock %}

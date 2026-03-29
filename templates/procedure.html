@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Procedure — Four-Probe Lab{% endblock %}
+{% block heading %}Experimental Procedure{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="section-label">Step-by-Step Instructions</div>
+
+    <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+            <strong>Sample Preparation</strong>
+            <p>Clean the Silicon specimen surface with acetone or IPA to remove any oxide or contamination. Mount it
+                flat on the insulated sample holder. Ensure the surface is smooth at all four probe contact points.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+            <strong>Probe Alignment &amp; Contact</strong>
+            <p>Lower the four collinear, equally-spaced tungsten probes (s = 0.20 cm) gently onto the specimen using the
+                micrometer screw. Apply minimum pressure sufficient for stable electrical contact — excessive force will
+                crack the specimen.</p>
+            <div class="step-note">⚠ Probe order (left to right): P1 – P2 – P3 – P4. Verify equal spacing with a
+                magnifier if possible.</div>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+            <strong>Circuit Connections</strong>
+            <p>Connect the <strong>outer probes P1 &amp; P4</strong> to the Constant Current Source (CCS). Connect the
+                <strong>inner probes P2 &amp; P3</strong> to the Digital Millivoltmeter (DMV). Double-check polarity.
+            </p>
+            <div class="step-note">📌 Critical: Never connect the current source to the inner probes or the voltmeter to
+                the outer probes.</div>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+            <strong>Thermocouple Installation</strong>
+            <p>Insert the type-K thermocouple probe into the thermocouple hole in the sample holder, positioned as close
+                to the specimen as possible. Connect to the digital temperature indicator and verify room temperature is
+                displayed correctly.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+            <strong>Room Temperature Reading</strong>
+            <p>Set the current source to I = 5 mA. Record the temperature T₁ (≈ 27°C) and the corresponding voltage V₁
+                from the millivoltmeter. This is observation number 1.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+            <strong>Heating &amp; Data Collection</strong>
+            <p>Switch on the oven and set the temperature controller to increase in steps of approximately 10°C. At each
+                step, wait ~2 minutes for temperature to stabilize, then record T (°C) and V (mV) in the Observation
+                Table.</p>
+            <div class="step-note">📌 Keep the current I constant at 5 mA throughout. Do not adjust it between readings.
+            </div>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+            <strong>Maximum Temperature</strong>
+            <p>Continue until ~175°C (448 K). Record at least 14–16 readings. More readings improve the accuracy of the
+                ln(ρ) vs 1/T regression.</p>
+            <div class="step-note">⚠ Do not exceed 200°C — above this temperature the specimen properties may be
+                permanently altered.</div>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-body">
+            <strong>Cooling Down</strong>
+            <p>Switch off the heater after the last reading. Allow the system to cool naturally to room temperature
+                before removing the specimen or disconnecting probes.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">9</div>
+        <div class="step-body">
+            <strong>Calculations &amp; Graph</strong>
+            <p>Use the Observation and Calculation pages to compute R = V/I, ρ = R·πW/ln2, and ln(ρ) for each reading.
+                Plot ln(ρ) vs 1/T on the Graph page to determine the slope and hence the band gap energy Eg.</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="card">
+    <div class="section-label">Observation Table Format</div>
+    <p>The following quantities must be recorded/calculated for each temperature step:</p>
+    <div class="info-grid">
+        <div class="info-tile">
+            <div class="tile-label">Record</div>
+            <div class="tile-val">T (°C)</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Record</div>
+            <div class="tile-val">V (mV)</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Convert</div>
+            <div class="tile-val">T (K) = T(°C) + 273.15</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Calculate</div>
+            <div class="tile-val">1/T × 10³</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Calculate</div>
+            <div class="tile-val">R = V/I (Ω)</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Calculate</div>
+            <div class="tile-val">ρ = R·πW/ln2</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Calculate</div>
+            <div class="tile-val">ln(ρ)</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Fixed</div>
+            <div class="tile-val">I = 5 mA</div>
+        </div>
+        <div class="info-tile">
+            <div class="tile-label">Fixed</div>
+            <div class="tile-val">W = 0.05 cm</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
