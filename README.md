@@ -46,37 +46,21 @@ sudo apt install python3-venv python3-full
 
 ---
 
-## Push to GitHub (already initialised)
-
-Since you have already run `git init` and added the files, just do:
+## Push to GitHub
 
 ```bash
-cd Four_Probe_Lab
-
-# 1. Make sure .gitignore is applied (removes venv/ etc. from tracking)
+# Remove venv from tracking if accidentally staged
 git rm -r --cached venv/ --ignore-unmatch
 git rm -r --cached __pycache__/ --ignore-unmatch
 
-# 2. Stage everything
+# Stage everything
 git add .
 
-# 3. Commit
-git commit -m "Four-Probe Method Virtual Lab — initial commit"
+# Commit
+git commit -m "Replaced single-HTML version with full multi-language Flask app"
 
-# 4. Create a repo on GitHub (github.com → New repository → name it four-probe-lab)
-#    Then connect and push:
-git remote add origin https://github.com/YOUR_USERNAME/four-probe-lab.git
-git branch -M main
-git push -u origin main
-```
-
-> Replace `YOUR_USERNAME` with your actual GitHub username.
-
-After this, every future change is just:
-```bash
-git add .
-git commit -m "your message"
-git push
+# Push
+git push origin main
 ```
 
 ---
@@ -87,16 +71,15 @@ Once your code is on GitHub:
 
 1. Go to **https://render.com** → Sign up free
 2. Click **New → Web Service**
-3. Connect your GitHub account and select the `four-probe-lab` repo
+3. Connect your GitHub account and select the repo
 4. Fill in the settings:
-   - **Name**: `four-probe-lab` (or anything you like)
    - **Runtime**: `Python`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn app:app`
 5. Click **Deploy**
 
 You'll get a permanent public URL like:
-`https://four-probe-lab.onrender.com`
+`https://four-probe-experiment.onrender.com`
 
 Share that URL with anyone — no PC needs to stay on.
 
@@ -131,24 +114,24 @@ Four_Probe_Lab/
 ├── .gitignore                # excludes venv/, __pycache__/, etc.
 ├── README.md
 ├── templates/                # HTML5 + Jinja2 (server-rendered)
-│   ├── base.html             #   Sidebar layout
-│   ├── index.html            #   Home / overview
-│   ├── theory.html           #   Aim, theory, formulas
-│   ├── apparatus.html        #   Instruments & specimen specs
-│   ├── procedure.html        #   9-step procedure
-│   ├── simulation.html       #   Interactive circuit simulation
-│   ├── observation.html      #   Observation table
-│   ├── calculation.html      #   Step-by-step calculator
-│   ├── graph.html            #   ln(rho) vs 1/T graph
-│   └── result.html           #   Result & precautions
+│   ├── base.html
+│   ├── index.html
+│   ├── theory.html
+│   ├── apparatus.html
+│   ├── procedure.html
+│   ├── simulation.html
+│   ├── observation.html
+│   ├── calculation.html
+│   ├── graph.html
+│   └── result.html
 └── static/
-    ├── css/main.css          # CSS3 — all styles
+    ├── css/main.css
     └── js/
-        ├── main.js           # Global utilities
-        ├── simulation.js     # Canvas diagram + API calls
-        ├── observation.js    # Table management + CSV export
-        ├── calculation.js    # Step-by-step calculator logic
-        └── graph.js          # Canvas graph renderer
+        ├── main.js
+        ├── simulation.js
+        ├── observation.js
+        ├── calculation.js
+        └── graph.js
 ```
 
 ---
