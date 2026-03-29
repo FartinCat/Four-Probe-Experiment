@@ -5,70 +5,116 @@ semiconductor and determining its band gap using the Four-Probe Method.
 
 ---
 
-## Quick Start (Linux — Recommended)
+## Quick Start (Linux)
 
 ```bash
-cd D:/Git_Work/Project/Four_Probe_Lab
+cd Four_Probe_Lab
 
-# Make the setup script executable (first time only)
 chmod +x setup.sh
-
-# Run it — creates venv, installs Flask, starts server
 ./setup.sh
 ```
 
 Then open **http://localhost:5050** in your browser.
+Press **Ctrl+C** to stop the server.
 
 ---
 
 ## Manual Setup (Linux)
 
-If you prefer doing it step by step:
-
 ```bash
-# 1. Create a virtual environment (isolated — does NOT touch system Python)
+# 1. Create isolated virtual environment
 python3 -m venv venv
 
 # 2. Activate it
 source venv/bin/activate
 
-# 3. Install Flask into the venv
+# 3. Install Flask
 pip install -r requirements.txt
 
-# 4. Run the server
+# 4. Run
 python app.py
 ```
 
-Open **http://localhost:5050** in your browser.
-
-To stop the server: **Ctrl + C**
-To deactivate the venv when done: type `deactivate`
-
 ---
 
-## If python3-venv is missing (Ubuntu/Debian only)
-
-The `python3 -m venv` command requires the `python3-venv` package.
-Install it once with:
+## If python3-venv is missing
 
 ```bash
 sudo apt install python3-venv python3-full
+# then run ./setup.sh normally — no more sudo needed
 ```
-
-Then run `./setup.sh` normally — no more sudo needed after this.
 
 ---
 
-## Why a virtual environment instead of sudo apt?
+## Push to GitHub (already initialised)
 
-| Method | What it does |
-|---|---|
-| `sudo apt install python3-flask` | Installs an old, system-managed Flask. Can break OS tools. |
-| `sudo pip install flask` | Installs globally. Breaks Debian's "externally managed" policy. |
-| `python3 -m venv venv` ✅ | Creates an isolated folder. Safe, clean, no sudo needed. |
+Since you have already run `git init` and added the files, just do:
 
-The virtual environment lives entirely inside the project folder as `venv/`.
-Deleting it removes Flask completely with no side effects.
+```bash
+cd Four_Probe_Lab
+
+# 1. Make sure .gitignore is applied (removes venv/ etc. from tracking)
+git rm -r --cached venv/ --ignore-unmatch
+git rm -r --cached __pycache__/ --ignore-unmatch
+
+# 2. Stage everything
+git add .
+
+# 3. Commit
+git commit -m "Four-Probe Method Virtual Lab — initial commit"
+
+# 4. Create a repo on GitHub (github.com → New repository → name it four-probe-lab)
+#    Then connect and push:
+git remote add origin https://github.com/YOUR_USERNAME/four-probe-lab.git
+git branch -M main
+git push -u origin main
+```
+
+> Replace `YOUR_USERNAME` with your actual GitHub username.
+
+After this, every future change is just:
+```bash
+git add .
+git commit -m "your message"
+git push
+```
+
+---
+
+## Deploy Free to Render.com (share with friends)
+
+Once your code is on GitHub:
+
+1. Go to **https://render.com** → Sign up free
+2. Click **New → Web Service**
+3. Connect your GitHub account and select the `four-probe-lab` repo
+4. Fill in the settings:
+   - **Name**: `four-probe-lab` (or anything you like)
+   - **Runtime**: `Python`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app`
+5. Click **Deploy**
+
+You'll get a permanent public URL like:
+`https://four-probe-lab.onrender.com`
+
+Share that URL with anyone — no PC needs to stay on.
+
+---
+
+## Share instantly with ngrok (no deployment)
+
+```bash
+# Terminal 1 — start your lab
+./setup.sh
+
+# Terminal 2 — expose it publicly
+sudo snap install ngrok
+ngrok http 5050
+```
+
+Copy the `https://xxxx.ngrok.io` link and share it.
+Works as long as your machine is running.
 
 ---
 
@@ -77,9 +123,12 @@ Deleting it removes Flask completely with no side effects.
 ```
 Four_Probe_Lab/
 ├── app.py                    # Python/Flask — backend + physics engine
-├── requirements.txt          # flask>=3.0.0
-├── setup.sh                  # Linux/macOS one-click setup & run
+├── requirements.txt          # flask, gunicorn
+├── Procfile                  # for Render.com deployment
+├── runtime.txt               # Python version for Render.com
+├── setup.sh                  # Linux one-click setup & run
 ├── setup.bat                 # Windows one-click setup & run
+├── .gitignore                # excludes venv/, __pycache__/, etc.
 ├── README.md
 ├── templates/                # HTML5 + Jinja2 (server-rendered)
 │   ├── base.html             #   Sidebar layout
@@ -95,11 +144,11 @@ Four_Probe_Lab/
 └── static/
     ├── css/main.css          # CSS3 — all styles
     └── js/
-        ├── main.js           # JS — global utilities
-        ├── simulation.js     # JS — canvas diagram + API
-        ├── observation.js    # JS — table + CSV export
-        ├── calculation.js    # JS — step-by-step calculator
-        └── graph.js          # JS — canvas graph renderer
+        ├── main.js           # Global utilities
+        ├── simulation.js     # Canvas diagram + API calls
+        ├── observation.js    # Table management + CSV export
+        ├── calculation.js    # Step-by-step calculator logic
+        └── graph.js          # Canvas graph renderer
 ```
 
 ---
@@ -113,21 +162,7 @@ Four_Probe_Lab/
 | Styles | CSS3 |
 | Interactivity | Vanilla JavaScript |
 | Physics engine | Python 3 (in app.py) |
-
----
-
-## Lab Workflow
-
-| Page | What you do |
-|---|---|
-| Theory | Read the aim, formulas, and physics |
-| Apparatus | Check specimen specs and instruments |
-| Procedure | Follow 9 experimental steps |
-| Simulation | Drag sliders — see live V, R, ρ |
-| Observation | Enter T(°C) and V(mV) — rest auto-calculated |
-| Calculation | Step-by-step calculator + band gap from slope |
-| Graph | Auto-plotted ln(ρ) vs 1/T with regression |
-| Result | Band gap Eg, % error, precautions |
+| Deployment | Render.com + Gunicorn |
 
 ---
 
