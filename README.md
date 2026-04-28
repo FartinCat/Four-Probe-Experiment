@@ -155,3 +155,5 @@ Four_Probe_Lab/
 - **Resistivity**: ρ = (V/I) × πW / ln(2)   *[thin-specimen, W/s < 0.5]*
 - **Band gap**:   Eg = 2k × |slope of ln(ρ) vs 1/T|
 - **Standard**:   Eg(Si) = 1.12 eV
+
+---
